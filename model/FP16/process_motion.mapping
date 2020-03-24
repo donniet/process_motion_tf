@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<mapping>
+	<map>
+		<framework name="output" out_port_id="0"/>
+		<IR id="14" name="Reshape" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="Reshape" out_port_id="0"/>
+		<IR id="14" name="Reshape" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="Reshape/shape" out_port_id="0"/>
+		<IR id="13" name="Reshape/shape/Output_0/Data__const" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="input" out_port_id="0"/>
+		<IR id="0" name="input" out_port_id="0"/>
+	</map>
+	<map>
+		<framework name="norm/Sqrt" out_port_id="0"/>
+		<IR id="9" name="norm/Sqrt" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="norm/Sum" out_port_id="0"/>
+		<IR id="8" name="norm/Sum/FinalReshapePower/After" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="Cast" out_port_id="0"/>
+		<IR id="1" name="strided_slice/Split" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="strided_slice" out_port_id="0"/>
+		<IR id="1" name="strided_slice/Split" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="norm/mul" out_port_id="0"/>
+		<IR id="2" name="norm/mul" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="AvgPool" out_port_id="0"/>
+		<IR id="12" name="AvgPool/Permute_85" out_port_id="1"/>
+	</map>
+</mapping>

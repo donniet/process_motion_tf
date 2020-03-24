@@ -1,0 +1,317 @@
+<?xml version="1.0" ?>
+<net batch="1" name="process_motion" version="5">
+	<layers>
+		<layer id="0" name="input" precision="FP16" type="Input">
+			<output>
+				<port id="0">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>4</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="1" name="strided_slice/Split" precision="FP16" type="Split">
+			<data axis="3"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>4</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+				</port>
+				<port id="2">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="2" name="norm/mul" precision="FP16" type="Eltwise">
+			<data operation="mul"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="3" name="norm/Sum/Reshape/DimData_const" precision="FP16" type="Const">
+			<output>
+				<port id="1">
+					<dim>4</dim>
+				</port>
+			</output>
+			<blobs>
+				<custom offset="0" size="8"/>
+			</blobs>
+		</layer>
+		<layer id="4" name="norm/Sum/Reshape" precision="FP16" type="Reshape">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+				</port>
+				<port id="1">
+					<dim>4</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2">
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="5" name="norm/Sum/Pool" precision="FP16" type="Pooling">
+			<data exclude-pad="false" kernel="2,1" pads_begin="0,0" pads_end="0,0" pool-method="avg" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>2</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1">
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="6" name="norm/Sum/FinalReshape/DimData_const" precision="FP16" type="Const">
+			<output>
+				<port id="1">
+					<dim>4</dim>
+				</port>
+			</output>
+			<blobs>
+				<custom offset="8" size="8"/>
+			</blobs>
+		</layer>
+		<layer id="7" name="norm/Sum/FinalReshape" precision="FP16" type="Reshape">
+			<input>
+				<port id="0">
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>4</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="8" name="norm/Sum/FinalReshapePower/After" precision="FP16" type="Power">
+			<data power="1" scale="2.0" shift="0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="9" name="norm/Sqrt" precision="FP16" type="Power">
+			<data power="0.5" scale="1" shift="0"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="10" name="AvgPool/Permute_" precision="FP16" type="Permute">
+			<data order="0,3,1,2"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="11" name="AvgPool" precision="FP16" type="Pooling">
+			<data auto_pad="valid" exclude-pad="true" kernel="121,68" pads_begin="0,0" pads_end="0,0" pool-method="avg" strides="1,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>121</dim>
+					<dim>68</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="12" name="AvgPool/Permute_85" precision="FP16" type="Permute">
+			<data order="0,2,3,1"/>
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="1">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+		<layer id="13" name="Reshape/shape/Output_0/Data__const" precision="FP16" type="Const">
+			<output>
+				<port id="1">
+					<dim>1</dim>
+				</port>
+			</output>
+			<blobs>
+				<custom offset="16" size="2"/>
+			</blobs>
+		</layer>
+		<layer id="14" name="Reshape" precision="FP16" type="Reshape">
+			<input>
+				<port id="0">
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+					<dim>1</dim>
+				</port>
+				<port id="1">
+					<dim>1</dim>
+				</port>
+			</input>
+			<output>
+				<port id="2">
+					<dim>1</dim>
+				</port>
+			</output>
+		</layer>
+	</layers>
+	<edges>
+		<edge from-layer="0" from-port="0" to-layer="1" to-port="0"/>
+		<edge from-layer="1" from-port="1" to-layer="2" to-port="0"/>
+		<edge from-layer="1" from-port="1" to-layer="2" to-port="1"/>
+		<edge from-layer="2" from-port="2" to-layer="4" to-port="0"/>
+		<edge from-layer="3" from-port="1" to-layer="4" to-port="1"/>
+		<edge from-layer="4" from-port="2" to-layer="5" to-port="0"/>
+		<edge from-layer="5" from-port="1" to-layer="7" to-port="0"/>
+		<edge from-layer="6" from-port="1" to-layer="7" to-port="1"/>
+		<edge from-layer="7" from-port="2" to-layer="8" to-port="0"/>
+		<edge from-layer="8" from-port="1" to-layer="9" to-port="0"/>
+		<edge from-layer="9" from-port="1" to-layer="10" to-port="0"/>
+		<edge from-layer="10" from-port="1" to-layer="11" to-port="0"/>
+		<edge from-layer="11" from-port="1" to-layer="12" to-port="0"/>
+		<edge from-layer="12" from-port="1" to-layer="14" to-port="0"/>
+		<edge from-layer="13" from-port="1" to-layer="14" to-port="1"/>
+	</edges>
+	<meta_data>
+		<MO_version value="2019.1.0-341-gc9b66a2"/>
+		<cli_parameters>
+			<data_type value="DIR"/>
+			<disable_fusing value="False"/>
+			<disable_gfusing value="False"/>
+			<disable_nhwc_to_nchw value="True"/>
+			<disable_resnet_optimization value="False"/>
+			<enable_concat_optimization value="False"/>
+			<extensions value="DIR"/>
+			<framework value="tf"/>
+			<generate_deprecated_IR_V2 value="False"/>
+			<input value="input"/>
+			<input_model value="DIR/process_motion.pb"/>
+			<input_model_is_text value="False"/>
+			<input_shape value="[1,121,68,4]"/>
+			<keep_shape_ops value="False"/>
+			<log_level value="ERROR"/>
+			<mean_scale_values value="{}"/>
+			<mean_values value="()"/>
+			<move_to_preprocess value="False"/>
+			<output value="['output']"/>
+			<output_dir value="DIR"/>
+			<placeholder_shapes value="{'input': array([  1, 121,  68,   4])}"/>
+			<reverse_input_channels value="False"/>
+			<scale_values value="()"/>
+			<silent value="False"/>
+			<version value="False"/>
+			<unset unset_cli_parameters="batch, finegrain_fusing, freeze_placeholder_with_value, input_checkpoint, input_meta_graph, model_name, saved_model_dir, saved_model_tags, scale, tensorboard_logdir, tensorflow_custom_layer_libraries, tensorflow_custom_operations_config_update, tensorflow_object_detection_api_pipeline_config, tensorflow_operation_patterns, tensorflow_subgraph_patterns, tensorflow_use_custom_operations_config"/>
+		</cli_parameters>
+	</meta_data>
+</net>
